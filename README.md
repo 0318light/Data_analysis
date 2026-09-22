@@ -1,4 +1,4 @@
-# 🫁 Thoracic Surgery Deep Learning Model (폐암 수술 환자 생존 예측)
+# 🫁 3주차 Thoracic Surgery Deep Learning Model (폐암 수술 환자 생존 예측)
 
 이 프로젝트는 환자의 임상 기록 데이터를 바탕으로 수술 후 생존 여부를 예측하는 인공신경망 딥러닝 모델입니다. 파이썬의 `TensorFlow`와 `Keras` 라이브러리를 활용하여 구현되었습니다.
 

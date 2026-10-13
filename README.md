@@ -9,10 +9,12 @@
 
 ```
 Data_analysis/
+├── 3주차/
+│   └── My_First_Deeplearning.py             # 폐암 수술 환자 생존 예측 딥러닝
 ├── 4주차/
 │   └── 4주차_assignment_2026 (1).ipynb      # pandas 기초 실습 (15문항)
 ├── 5주차/
-│   └── My_First_Deeplearning.py             # 폐암 수술 환자 생존 예측 딥러닝
+│   └── 5주차_assign_2026.ipynb              # pandas 데이터 가공 · 전처리 실습
 ├── 6주차/
 │   └── ShoppingMall_with_Clustering.ipynb   # K-Means · 계층적 군집 분석
 └── README.md
@@ -20,9 +22,41 @@ Data_analysis/
 
 | 주차 | 주제 | 파일 | 주요 라이브러리 |
 |---|---|---|---|
+| 3주차 | 첫 딥러닝 모델 (이진 분류) | `My_First_Deeplearning.py` | TensorFlow / Keras, NumPy |
 | 4주차 | pandas 기초 (Series / DataFrame) | `4주차_assignment_2026 (1).ipynb` | pandas, seaborn |
-| 5주차 | 첫 딥러닝 모델 (이진 분류) | `My_First_Deeplearning.py` | TensorFlow / Keras, NumPy |
+| 5주차 | pandas 데이터 가공 · 전처리 | `5주차_assign_2026.ipynb` | pandas, NumPy, seaborn |
 | 6주차 | 비지도 학습 – 군집 분석 | `ShoppingMall_with_Clustering.ipynb` | scikit-learn, SciPy, yellowbrick, seaborn |
+
+---
+
+## 🫁 3주차: 폐암 수술 환자 생존 예측 딥러닝 (My First Deep Learning)
+
+환자의 임상 기록 데이터를 바탕으로 수술 후 생존 여부를 예측하는 인공신경망 모델입니다.
+
+### 🛠️ 사용 라이브러리
+* **TensorFlow / Keras** (딥러닝 모델 구축)
+* **NumPy** (데이터 로드 및 난수 고정)
+* **Google Colab** (`google.colab.files`로 CSV 업로드)
+
+### 📂 데이터셋
+* **파일명**: `ThoraricSurgery.csv` (실행 시 직접 업로드)
+* **입력 데이터 (X)**: 환자의 임상 기록 및 수술 관련 특징 17개 (인덱스 `0~16`)
+* **결과 데이터 (Y)**: 수술 후 생존/사망 여부 (인덱스 `17`)
+
+### 🧠 모델 구조
+`Sequential` 모델로 층을 순서대로 쌓았습니다.
+
+| 층 | 노드 수 | 입력 | 활성화 함수 |
+|---|---|---|---|
+| 은닉층 | 30 | 17개 특징 (`input_dim=17`) | `ReLU` |
+| 출력층 | 1 | – | `Sigmoid` (0~1 확률 → 이진 분류) |
+
+### ⚙️ 학습 설정
+* **손실 함수**: `binary_crossentropy`
+* **최적화 함수**: `adam`
+* **평가 지표**: `accuracy`
+* **하이퍼파라미터**: `epochs=100`, `batch_size=10`
+* **난수 시드**: `np.random.seed(3)`, `tf.random.set_seed(3)` (재현성 확보)
 
 ---
 
@@ -67,34 +101,32 @@ pandas의 **Series / DataFrame 핵심 문법을 익히는 15개의 실습 문제
 
 ---
 
-## 🫁 5주차: 폐암 수술 환자 생존 예측 딥러닝 (My First Deep Learning)
+## 🧹 5주차: pandas 데이터 가공 · 전처리 실습
 
-환자의 임상 기록 데이터를 바탕으로 수술 후 생존 여부를 예측하는 인공신경망 모델입니다.
+4주차 기초 문법에 이어, **조건 필터링 · 열 연산 · 정렬 · 통계 요약 · 결측치/중복 처리**를 다루는 실습입니다.
 
 ### 🛠️ 사용 라이브러리
-* **TensorFlow / Keras** (딥러닝 모델 구축)
-* **NumPy** (데이터 로드 및 난수 고정)
-* **Google Colab** (`google.colab.files`로 CSV 업로드)
+* **pandas**, **NumPy** (`np.nan`으로 결측치 생성)
+* **seaborn** (`titanic` 내장 데이터셋 로드용)
+* **Google Colab** (`/content/sample_data/iris3.csv` 사용)
 
-### 📂 데이터셋
-* **파일명**: `ThoraricSurgery.csv` (실행 시 직접 업로드)
-* **입력 데이터 (X)**: 환자의 임상 기록 및 수술 관련 특징 17개 (인덱스 `0~16`)
-* **결과 데이터 (Y)**: 수술 후 생존/사망 여부 (인덱스 `17`)
+### 📝 실습 내용
 
-### 🧠 모델 구조
-`Sequential` 모델로 층을 순서대로 쌓았습니다.
+| 과제 | 내용 |
+|---|---|
+| 1 | `titanic` 불리언 인덱싱 – 25세 이상 남성 행 중 앞 5행 출력 |
+| 2 | `query()`로 25세 이상 & pclass 3 데이터 출력 *(선택)* |
+| 3 | 성적표에 `인문`(국어+영어), `과학`(물리+화학) 열 추가 → `sort_values()`로 과학 내림차순 정렬 |
+| 4 | `iris3.csv` 읽기 → 열 이름 변경 → `head` / `info` / `describe` / `nunique` → 최대값 · 표준편차 · 상관계수 |
+| 5 | `dropna()`로 결측치 처리 – 전체 삭제, `how='all'`, `thresh=4` |
+| 6 | `drop_duplicates()`로 중복 행 제거 – 전체 기준 / `subset=['c1','c3']` 기준 |
+| 실습 | `set_index` → `drop` → 행 추가(`loc`) → `rename` → 값 수정 → 단일·다중 기준 정렬 → 열 추가 |
 
-| 층 | 노드 수 | 입력 | 활성화 함수 |
-|---|---|---|---|
-| 은닉층 | 30 | 17개 특징 (`input_dim=17`) | `ReLU` |
-| 출력층 | 1 | – | `Sigmoid` (0~1 확률 → 이진 분류) |
-
-### ⚙️ 학습 설정
-* **손실 함수**: `binary_crossentropy`
-* **최적화 함수**: `adam`
-* **평가 지표**: `accuracy`
-* **하이퍼파라미터**: `epochs=100`, `batch_size=10`
-* **난수 시드**: `np.random.seed(3)`, `tf.random.set_seed(3)` (재현성 확보)
+### 🔑 핵심 학습 포인트
+* 기존 열을 연산해 새 열 만들기, `inplace=True`로 원본 변경
+* `sort_values()` 단일·다중 기준, 오름차순/내림차순 정렬
+* 기술 통계 함수 (`max`, `std`, `corr`, `nunique`, `describe`)
+* 결측치 처리 옵션 (`how`, `thresh`)과 중복 제거 (`subset`)
 
 ---
 
@@ -140,7 +172,8 @@ pandas의 **Series / DataFrame 핵심 문법을 익히는 15개의 실습 문제
 
 1. 원하는 주차의 `.ipynb` / `.py` 파일을 **Google Colab**에서 엽니다.
 2. 필요한 CSV 파일을 Colab에 업로드합니다.
+   * 3주차: `ThoraricSurgery.csv` (실행 시 업로드 창)
    * 4주차: `Case.csv`, `titanic.csv` → `/content/sample_data/`
-   * 5주차: `ThoraricSurgery.csv` (실행 시 업로드 창)
+   * 5주차: `iris3.csv` → `/content/sample_data/`
    * 6주차: `Mall_Customers.csv`, `food.csv` → `/content/`
 3. 6주차는 `yellowbrick`이 필요하면 `!pip install yellowbrick` 후 실행합니다.

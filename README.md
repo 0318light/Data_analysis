@@ -17,6 +17,10 @@ Data_analysis/
 │   └── 5주차_assign_2026.ipynb              # pandas 데이터 가공 · 전처리 실습
 ├── 6주차/
 │   └── ShoppingMall_with_Clustering.ipynb   # K-Means · 계층적 군집 분석
+├── 7주차/
+│   └── dt_rf_fill.ipynb                     # 의사결정나무 · 랜덤 포레스트
+├── 9주차/
+│   └── 9주차_assign_2026.ipynb              # 하이퍼파라미터 탐색 · 앙상블 모델 비교
 └── README.md
 ```
 
@@ -26,6 +30,8 @@ Data_analysis/
 | 4주차 | pandas 기초 (Series / DataFrame) | `4주차_assignment_2026 (1).ipynb` | pandas, seaborn |
 | 5주차 | pandas 데이터 가공 · 전처리 | `5주차_assign_2026.ipynb` | pandas, NumPy, seaborn |
 | 6주차 | 비지도 학습 – 군집 분석 | `ShoppingMall_with_Clustering.ipynb` | scikit-learn, SciPy, yellowbrick, seaborn |
+| 7주차 | 의사결정나무 · 랜덤 포레스트 | `dt_rf_fill.ipynb` | scikit-learn, NumPy, matplotlib |
+| 9주차 | 하이퍼파라미터 탐색 · 앙상블 모델 비교 | `9주차_assign_2026.ipynb` | scikit-learn, XGBoost, LightGBM, pandas, seaborn |
 
 ---
 
@@ -168,6 +174,74 @@ pandas의 **Series / DataFrame 핵심 문법을 익히는 15개의 실습 문제
 
 ---
 
+## 🌳 7주차: 의사결정나무 · 랜덤 포레스트
+
+트리 기반 모델로 **분류와 회귀**를 수행하고, 교차 검증과 그리드 서치로 성능을 평가하는 실습입니다.
+
+### 🛠️ 사용 라이브러리
+* **scikit-learn** (`DecisionTreeClassifier/Regressor`, `RandomForestClassifier/Regressor`, `cross_val_score`, `GridSearchCV`, `plot_tree`)
+* **NumPy / matplotlib**
+
+### 📂 데이터셋
+| 데이터 | 내용 |
+|---|---|
+| `load_iris()` | 붓꽃 데이터 – 꽃잎 길이·너비(`iris.data[:, 2:]`)로 품종 분류 |
+| 직접 생성한 데이터 | `y = 4(X-0.5)² + 노이즈`, 200개 샘플 (회귀용) |
+
+### 📝 실습 내용
+
+| 실습 | 내용 |
+|---|---|
+| 의사결정나무 분류 | `max_depth=3`, 5-fold 교차 검증 정확도, `plot_tree` 시각화 |
+| 의사결정나무 회귀 | `max_depth=2`, `neg_mean_squared_error` → RMSE 계산, 트리 시각화 |
+| 랜덤 포레스트 분류 | `n_estimators=30`, 교차 검증 정확도 |
+| 랜덤 포레스트 회귀 | `n_estimators=20`, 교차 검증 RMSE |
+| 그리드 서치 | `max_depth` 3~9 × `min_samples_split` 2~9 조합 탐색 → `best_params_`, `best_score_` |
+
+### 🔑 핵심 학습 포인트
+* 트리 모델의 분류/회귀 사용법과 `max_depth`에 따른 복잡도 조절
+* 단일 트리 vs 여러 트리를 묶은 랜덤 포레스트(배깅)
+* `cross_val_score`로 정확도·RMSE 평가 (`y.squeeze()`로 1차원 변환)
+* `GridSearchCV`로 최적 하이퍼파라미터 찾기
+
+---
+
+## 🚀 9주차: 하이퍼파라미터 탐색 · 앙상블 모델 비교
+
+그리드/랜덤 서치를 비교하고, **여러 분류·회귀 모델의 성능을 교차 검증으로 비교**한 뒤 보팅과 특성 중요도까지 다루는 실습입니다.
+
+### 🛠️ 사용 라이브러리
+* **scikit-learn** (`GridSearchCV`, `RandomizedSearchCV`, `RandomForestClassifier`, `AdaBoostClassifier/Regressor`, `SVC/SVR`, `LinearRegression`, `VotingClassifier`)
+* **XGBoost** (`XGBClassifier`, `XGBRegressor`), **LightGBM** (`LGBMClassifier`, `LGBMRegressor`)
+* **SciPy** (`randint` – 랜덤 서치 분포), **pandas / NumPy / seaborn / matplotlib**
+
+### 📂 데이터셋
+| 데이터 | 내용 |
+|---|---|
+| `load_iris()` | 붓꽃 데이터 (그리드·랜덤 서치) |
+| `pima-indians-diabetes3.csv` | 피마 인디언 당뇨병 – 특성 8개(`X`), 당뇨병 여부(`y`) |
+| `Boston_house.csv` | 보스턴 집값 – `Target` 열을 예측 |
+
+### 📝 실습 내용
+
+| 실습 | 내용 |
+|---|---|
+| 그리드 서치 | `DecisionTreeClassifier`의 `max_depth`, `min_samples_split` 전체 조합 탐색 |
+| 랜덤 서치 | `randint` 분포에서 `n_iter=10`개 조합만 샘플링해 탐색 |
+| 분류 비교 | 당뇨병 데이터에 RandomForest · AdaBoost · SVC · XGBoost · LightGBM 적용, 5-fold 정확도 비교 |
+| 회귀 비교 | 보스턴 집값에 LinearRegression · SVR · AdaBoost · XGBoost · LightGBM 적용, `get_model_cv_prediction()`으로 평균 RMSE 비교 |
+| 보팅 | AdaBoost + SVC + LightGBM을 `VotingClassifier`로 결합 |
+| 특성 중요도 | XGBoost · LightGBM · AdaBoost의 `feature_importances_`를 seaborn 막대그래프로 시각화 |
+
+### 🔑 핵심 학습 포인트
+* 그리드 서치(전수 탐색) vs 랜덤 서치(샘플링 탐색)의 차이
+* 배깅(RandomForest)과 부스팅(AdaBoost · XGBoost · LightGBM) 계열 모델 비교
+* 여러 모델을 반복문으로 같은 기준(교차 검증)으로 평가하기
+* 보팅 앙상블로 서로 다른 모델 결합
+* 특성 중요도로 예측에 영향이 큰 변수 해석
+
+---
+
 ## ▶️ 실행 방법
 
 1. 원하는 주차의 `.ipynb` / `.py` 파일을 **Google Colab**에서 엽니다.
@@ -176,4 +250,7 @@ pandas의 **Series / DataFrame 핵심 문법을 익히는 15개의 실습 문제
    * 4주차: `Case.csv`, `titanic.csv` → `/content/sample_data/`
    * 5주차: `iris3.csv` → `/content/sample_data/`
    * 6주차: `Mall_Customers.csv`, `food.csv` → `/content/`
+   * 7주차: 업로드 불필요 (내장 데이터 · 직접 생성 데이터 사용)
+   * 9주차: `pima-indians-diabetes3.csv`, `Boston_house.csv` → `/content/`
 3. 6주차는 `yellowbrick`이 필요하면 `!pip install yellowbrick` 후 실행합니다.
+4. 9주차는 `xgboost`, `lightgbm`이 없으면 `!pip install xgboost lightgbm` 후 실행합니다.

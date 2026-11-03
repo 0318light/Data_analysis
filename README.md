@@ -21,6 +21,8 @@ Data_analysis/
 │   └── dt_rf_fill.ipynb                     # 의사결정나무 · 랜덤 포레스트
 ├── 9주차/
 │   └── 9주차_assign_2026.ipynb              # 하이퍼파라미터 탐색 · 앙상블 모델 비교
+├── 10주차/
+│   └── 10주차_assign_2026.ipynb             # ARIMA · LSTM 주가 예측
 └── README.md
 ```
 
@@ -32,6 +34,7 @@ Data_analysis/
 | 6주차 | 비지도 학습 – 군집 분석 | `ShoppingMall_with_Clustering.ipynb` | scikit-learn, SciPy, yellowbrick, seaborn |
 | 7주차 | 의사결정나무 · 랜덤 포레스트 | `dt_rf_fill.ipynb` | scikit-learn, NumPy, matplotlib |
 | 9주차 | 하이퍼파라미터 탐색 · 앙상블 모델 비교 | `9주차_assign_2026.ipynb` | scikit-learn, XGBoost, LightGBM, pandas, seaborn |
+| 10주차 | 시계열 – 주가 예측 (ARIMA · LSTM) | `10주차_assign_2026.ipynb` | FinanceDataReader, pmdarima, TensorFlow / Keras, scikit-learn |
 
 ---
 
@@ -242,6 +245,46 @@ pandas의 **Series / DataFrame 핵심 문법을 익히는 15개의 실습 문제
 
 ---
 
+## 📈 10주차: 시계열 주가 예측 (ARIMA · LSTM)
+
+**FinanceDataReader**로 실제 주가 데이터를 불러와, 통계 모델(**ARIMA**)과 딥러닝 모델(**LSTM**)로 테슬라 종가를 예측하는 실습입니다.
+
+### 🛠️ 사용 라이브러리
+* **FinanceDataReader** (`fdr.DataReader` – 주가 데이터 수집)
+* **pmdarima** (`ndiffs`, `nsdiffs`, `auto_arima`)
+* **TensorFlow / Keras** (`Sequential`, `LSTM`, `Dense`)
+* **scikit-learn** (`MinMaxScaler`), **pandas / NumPy / matplotlib**
+
+### 📂 데이터셋
+| 데이터 | 기간 | 용도 |
+|---|---|---|
+| 삼성전자 (`005930`) | 전체 / 2019-01-02 ~ 2022-08-01 | 데이터 불러오기 실습 |
+| 애플 (`AAPL`) | 전체 / 2019-01-02 ~ 2022-08-01 | 데이터 불러오기 실습 |
+| 테슬라 (`TSLA`) | 2021-11-01 ~ 2023-03-31 | ARIMA 예측 |
+| 테슬라 (`TSLA`) | 2022-11-01 ~ 2024-03-31 | LSTM 예측 |
+
+### 📝 실습 흐름
+1. **데이터 불러오기** – 종목 코드·기간을 지정해 `DataReader`로 조회, `Close`(종가) 열 선택
+2. **ARIMA 주가 예측**
+   * 종가를 학습 80% / 테스트 20%로 시간 순서대로 분할 후 시각화
+   * `ndiffs`(ADF · KPSS · PP), `nsdiffs`(OCSB · CH)로 차분 횟수 결정
+   * `auto_arima`(`d=1`, `p`·`q` 0~2, 계절성 없음)로 최적 모델 탐색
+   * 테스트 기간 한 번에 예측 vs `model_fit.update()`로 **한 스텝씩 갱신하며 예측** → RMSE 비교
+3. **LSTM 주가 예측**
+   * `MinMaxScaler`로 0~1 스케일링
+   * 직전 **30일(`wsize=30`)** 종가로 다음 날 종가를 맞히는 학습 데이터 생성
+   * `LSTM(28, return_sequences=True)` → `LSTM(28)` → `Dense(1)` 구조, `adam` · `mean_squared_error`, `epochs=30`
+   * 예측값을 `inverse_transform`으로 원래 가격으로 되돌린 뒤 실제 종가와 시각화 · RMSE 계산
+
+### 🔑 핵심 학습 포인트
+* 시계열 데이터는 섞지 않고 시간 순서대로 학습/테스트 분할
+* 차분으로 정상성 확보, `auto_arima`로 (p, d, q) 자동 선택
+* 새 관측값으로 모델을 갱신하는 롤링 예측이 장기 일괄 예측보다 정확함
+* LSTM 입력 형태 `(샘플 수, 시점 수, 특성 수)`와 슬라이딩 윈도우 구성
+* 스케일링 후 예측값 역변환, RMSE로 모델 성능 비교
+
+---
+
 ## ▶️ 실행 방법
 
 1. 원하는 주차의 `.ipynb` / `.py` 파일을 **Google Colab**에서 엽니다.
@@ -254,3 +297,4 @@ pandas의 **Series / DataFrame 핵심 문법을 익히는 15개의 실습 문제
    * 9주차: `pima-indians-diabetes3.csv`, `Boston_house.csv` → `/content/`
 3. 6주차는 `yellowbrick`이 필요하면 `!pip install yellowbrick` 후 실행합니다.
 4. 9주차는 `xgboost`, `lightgbm`이 없으면 `!pip install xgboost lightgbm` 후 실행합니다.
+5. 10주차는 CSV 업로드 없이 인터넷으로 주가를 받아오며, `!pip install -U finance-datareader pmdarima` 후 실행합니다.
